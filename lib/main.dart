@@ -1,6 +1,8 @@
 import 'package:farmadev/Escaner/interfaz_escaner.dart';
 import 'package:flutter/material.dart';
 
+import 'config/theme/app_theme.dart';
+
 void main() {
   runApp(const MainApp());
 }
@@ -10,8 +12,16 @@ class MainApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const MaterialApp(
-      home: Scaffold(body: Escaner()),
+    return MaterialApp(
+      debugShowCheckedModeBanner: false,
+      title: 'FARMADEV',
+      //el número que se le pase a AppTheme es el índice del color que se quiere seleccionar de la lista de colores
+      theme: AppTheme().getTheme(),
+      home: Scaffold(
+          appBar: AppBar(
+            title: const Text('FARMADEV'),
+          ),
+          body: const Escaner()),
     );
   }
 }
