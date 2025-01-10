@@ -3,6 +3,7 @@ import 'package:image_picker/image_picker.dart';
 
 class TextRecognizerService {
   final ImagePicker _imagePicker = ImagePicker();
+  String textoReconocido = "";
 
   /// Función para capturar una imagen desde la cámara y reconocer texto.
   Future<String> recognizeTextFromCamera() async {
@@ -26,9 +27,12 @@ class TextRecognizerService {
       textRecognizer.close();
 
       // Devolver el texto reconocido
-      return recognizedText.text.isNotEmpty
-          ? recognizedText.text
-          : "No se detectó texto.";
+      if (recognizedText.text.isNotEmpty) {
+        textoReconocido = recognizedText.text;
+        return recognizedText.text;
+      } else {
+        return "No se ha reconocido ningún texto";
+      }
     } catch (e) {
       return "Error al reconocer el texto: $e";
     }
