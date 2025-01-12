@@ -1,4 +1,5 @@
 import 'package:farmadev/Escaner/interfaz_escaner.dart';
+import 'package:farmadev/conexiones/consulta_apiCima.dart';
 import 'package:flutter/material.dart';
 
 import 'config/theme/app_theme.dart';
@@ -12,6 +13,8 @@ class MainApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    CimaApiService servicioPrueba = CimaApiService();
+    servicioPrueba.pruebaCima();
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       title: 'FARMADEV',
@@ -21,7 +24,7 @@ class MainApp extends StatelessWidget {
           appBar: AppBar(
             title: const Text('FARMADEV'),
           ),
-          body: const Escaner()),
+          body: Center(child: Text('¡Bienvenido a FARMADEV!'))),
     );
   }
 }

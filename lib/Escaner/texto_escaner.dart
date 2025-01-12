@@ -6,32 +6,48 @@ class TextRecognizerService {
   String textoReconocido = "";
 
   /// Función para capturar una imagen desde la cámara y reconocer texto.
-  Future<String> recognizeTextFromCamera() async {
+
+  Future<String> procesarImagen(XFile imagen) async {
+    final InputImage inputImage = InputImage.fromFilePath(imagen.path);
+    final TextRecognizer textRecognizer = TextRecognizer();
+
     try {
-      // Capturar una imagen desde la cámara
-      final XFile? image =
-          await _imagePicker.pickImage(source: ImageSource.camera);
-      if (image == null) return "No se capturó ninguna imagen.";
-
-      // Crear un InputImage a partir del archivo capturado
-      final InputImage inputImage = InputImage.fromFilePath(image.path);
-
-      // Inicializar el TextRecognizer
-      final TextRecognizer textRecognizer = TextRecognizer();
-
-      // Procesar la imagen
       final RecognizedText recognizedText =
           await textRecognizer.processImage(inputImage);
 
-      // Cerrar el recognizer
-      textRecognizer.close();
+      String mayorTexto = "";
+      double mayorTamanio = 0;
 
-      // Devolver el texto reconocido
-      if (recognizedText.text.isNotEmpty) {
-        textoReconocido = recognizedText.text;
-        return recognizedText.text;
+      // Iterar sobre los bloques y líneas para encontrar el texto más grande
+      for (TextBlock block in recognizedText.blocks) {
+        for (TextLine line in block.lines) {
+          // Obtener el tamaño de la línea desde su bounding box
+          double tamanioFuente = line.boundingBox.height;
+
+          if (tamanioFuente > mayorTamanio) {
+            mayorTamanio = tamanioFuente;
+            mayorTexto = line.text;
+          }
+        }
+      }
+
+      textRecognizer.close();
+      return mayorTexto; // Devuelve el texto con mayor tamaño de fuente
+    } catch (e) {
+      textRecognizer.close();
+      return "Error al procesar la imagen: $e";
+    }
+  }
+
+  Future<String> extraerBloquesTexto() async {
+    try {
+      final XFile? image =
+          await _imagePicker.pickImage(source: ImageSource.camera);
+      if (image == null) {
+        return "No se capturó ninguna imagen.";
       } else {
-        return "No se ha reconocido ningún texto";
+        String resultadoTexto = await procesarImagen(image);
+        return resultadoTexto;
       }
     } catch (e) {
       return "Error al reconocer el texto: $e";

@@ -1,3 +1,4 @@
+import 'package:farmadev/conexiones/consulta_apiCima.dart';
 import 'package:farmadev/Escaner/texto_escaner.dart';
 import 'package:flutter/material.dart';
 
@@ -28,10 +29,11 @@ class _EscanerState extends State<Escaner> {
           Center(
             child: ElevatedButton(
               onPressed: () async {
-                String resultado =
-                    await TextRecognizerService().recognizeTextFromCamera();
+                String textoExtraido =
+                    await TextRecognizerService().extraerBloquesTexto();
+
                 setState(() {
-                  textoEscaneado = resultado;
+                  textoEscaneado = textoExtraido;
                 });
               },
               child: const Text('Escanear'),
