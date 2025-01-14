@@ -1,4 +1,3 @@
-import 'package:farmadev/Escaner/interfaz_escaner.dart';
 import 'package:farmadev/conexiones/consulta_apiCima.dart';
 import 'package:flutter/material.dart';
 

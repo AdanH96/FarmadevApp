@@ -31,10 +31,6 @@ class CimaApiService {
       for (int i = 0; i < medicamentosObtenidos.length; i++) {
         print(medicamentosObtenidos[i]['nombre']);
       }
-      for (int i = 0; i < medicamentosObtenidos.length; i++) {
-        print(
-            'Nombre: ${medicamentosObtenidos[i]['nombre']}, Laboratorio: ${medicamentosObtenidos[i]['laboratorio']}');
-      }
     } catch (e) {
       print("Error al extraer texto: $e");
     }
