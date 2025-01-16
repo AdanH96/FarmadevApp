@@ -1,11 +1,13 @@
 import 'dart:convert';
+
 import 'package:farmadev/Escaner/texto_escaner.dart';
+import 'package:farmadev/farmaco_datasource/farmaco_interfaz.dart';
 import 'package:http/http.dart' as http;
 
 class CimaApiService {
   final String baseUrl = 'https://cima.aemps.es/cima/rest/medicamentos';
 
-  Future<List<dynamic>> buscarMedicamentos(String query) async {
+  Future<List<Farmaco>> buscarMedicamentos(String query) async {
     final url = Uri.parse('$baseUrl?nombre=$query');
 
     try {
@@ -13,7 +15,17 @@ class CimaApiService {
 
       if (response.statusCode == 200) {
         final Map<String, dynamic> data = json.decode(response.body);
-        return data['resultados']; // Devuelve la lista de resultados
+
+        if (data.containsKey('resultados')) {
+          List<Farmaco> listaFarmacos = (data['resultados'] as List)
+              .map((json) => Farmaco.fromJson(json))
+              .toList();
+
+          //retorna una lista de objetos farmacos
+          return listaFarmacos;
+        } else {
+          return []; // Retorna una lista vacía si no hay resultados
+        }
       } else {
         throw Exception('Error en la consulta: ${response.statusCode}');
       }

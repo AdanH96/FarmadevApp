@@ -1,4 +1,3 @@
-import 'package:farmadev/conexiones/consulta_apiCima.dart';
 import 'package:farmadev/Escaner/texto_escaner.dart';
 import 'package:flutter/material.dart';
 
@@ -13,6 +12,7 @@ class Escaner extends StatefulWidget {
   State<Escaner> createState() => _EscanerState();
 }
 
+//*ESTA CLASE VA A SER EL SCAFFOLD DE LA PANTALLA PRINCIPAL, DONDE ESTARÁ EL MENÚ CON ESCANER, INFORACION DE USUARIO ETC
 class _EscanerState extends State<Escaner> {
   String textoEscaneado = "Escanea un medicamento...";
 
