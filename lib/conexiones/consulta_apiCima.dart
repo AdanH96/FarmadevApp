@@ -15,16 +15,15 @@ class CimaApiService {
 
       if (response.statusCode == 200) {
         final Map<String, dynamic> data = json.decode(response.body);
+        print("JSON recibido: $data");
 
-        if (data.containsKey('resultados')) {
+        if (data.containsKey('resultados') && data['resultados'] is List) {
           List<Farmaco> listaFarmacos = (data['resultados'] as List)
               .map((json) => Farmaco.fromJson(json))
               .toList();
-
-          //retorna una lista de objetos farmacos
           return listaFarmacos;
         } else {
-          return []; // Retorna una lista vacía si no hay resultados
+          return []; // Si no hay resultados, devuelve una lista vacía.
         }
       } else {
         throw Exception('Error en la consulta: ${response.statusCode}');

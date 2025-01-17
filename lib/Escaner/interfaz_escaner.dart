@@ -1,9 +1,8 @@
-import 'package:farmadev/Escaner/texto_escaner.dart';
 import 'package:flutter/material.dart';
-
-//*CLASE DE PRUEBA ((IMPLEMENTAR BUSQUEDA POR CN, ESCRITO POR CAMPO. CASI TODOS LOS MEDICAMENTOS LO TRAEN))
-//buscar otra manera de buscar el medicamento. Por via escaner es poco fiable.
-//hay que buscar algun tipo de modulo por pyhton que sea atraves de fotos.
+import 'package:farmadev/Escaner/texto_escaner.dart';
+import 'package:farmadev/conexiones/consulta_apiCima.dart';
+import 'package:farmadev/farmaco_datasource/farmaco_interfaz.dart';
+import 'package:farmadev/interfaz_app/interfaz_builder_medicamento.dart'; // Se importa Medicamento.dart
 
 class Escaner extends StatefulWidget {
   const Escaner({super.key});
@@ -12,39 +11,90 @@ class Escaner extends StatefulWidget {
   State<Escaner> createState() => _EscanerState();
 }
 
-//*ESTA CLASE VA A SER EL SCAFFOLD DE LA PANTALLA PRINCIPAL, DONDE ESTARÁ EL MENÚ CON ESCANER, INFORACION DE USUARIO ETC
 class _EscanerState extends State<Escaner> {
   String textoEscaneado = "Escanea un medicamento...";
+  List<Farmaco> medicamentosObtenidos = [];
+  bool isLoading = false;
+  bool escaneoRealizado = false;
+
+  Future<void> escanearMedicamento() async {
+    setState(() {
+      isLoading = true;
+      escaneoRealizado = true;
+      textoEscaneado = "Escaneando...";
+    });
+
+    try {
+      // Extraer texto de la imagen
+      String query = await TextRecognizerService().extraerBloquesTexto();
+      print('Texto escaneado: $query');
+
+      if (query.isEmpty) {
+        throw Exception("No se detectó texto en la imagen.");
+      }
+
+      // Consultar API de medicamentos
+      List<Farmaco> resultado =
+          await CimaApiService().buscarMedicamentos(query);
+
+      // 🔄 Solo actualiza el estado después de completar la consulta
+      if (mounted) {
+        setState(() {
+          textoEscaneado = resultado.isNotEmpty
+              ? "Se han encontrado medicamentos:"
+              : "No se encontraron medicamentos.";
+          medicamentosObtenidos = resultado;
+          isLoading = false;
+        });
+      }
+    } catch (e) {
+      if (mounted) {
+        setState(() {
+          textoEscaneado = "Error al escanear: $e";
+          isLoading = false;
+        });
+      }
+      print("Error al extraer texto: $e");
+    }
+  }
+
+  void resetEscaner() {
+    setState(() {
+      escaneoRealizado = false;
+      medicamentosObtenidos.clear();
+      textoEscaneado = "Escanea un medicamento...";
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
-    //llamamos en constructor de buildcontext a textoEscaneado. Que devolverá un texto siempre.
-    //Está a la espera de la función asyncrona para esperar a que el texto cambie
-
     return Scaffold(
-        appBar: AppBar(
-          title: const Text('Escaner de código de barras'),
-        ),
-        body: ListView(children: [
-          Center(
-            child: ElevatedButton(
-              onPressed: () async {
-                String textoExtraido =
-                    await TextRecognizerService().extraerBloquesTexto();
-
-                setState(() {
-                  textoEscaneado = textoExtraido;
-                });
-              },
-              child: const Text('Escanear'),
-            ),
-          ),
-          const SizedBox(height: 20),
-          Center(
-              child: Text(
-            'El resultado es: $textoEscaneado',
-            style: const TextStyle(fontSize: 16),
-          ))
-        ]));
+      appBar: AppBar(title: const Text('Escanee un medicamento')),
+      body: isLoading
+          ? const Center(child: CircularProgressIndicator())
+          : escaneoRealizado
+              ? Medicamento(
+                  medicamentosObtenidos: medicamentosObtenidos,
+                  onBack: resetEscaner, // 🔄 Se limpia todo al regresar
+                )
+              : Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Center(
+                      child: ElevatedButton(
+                        onPressed: escanearMedicamento,
+                        child: const Text('Escanear'),
+                      ),
+                    ),
+                    const SizedBox(height: 20),
+                    Center(
+                      child: Text(
+                        textoEscaneado,
+                        style: const TextStyle(fontSize: 16),
+                      ),
+                    ),
+                  ],
+                ),
+    );
   }
 }

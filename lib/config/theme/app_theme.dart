@@ -18,6 +18,11 @@ class AppTheme {
     Colors.lightGreen,
     Colors.lime,
   ];
+
+  AppTheme({int? seleccionColor}) {
+    colorSeleccionado = seleccionColor;
+  }
+
   void incrementarColor() {
     if (colorSeleccionado != null) {
       colorSeleccionado = colorSeleccionado! + 1;

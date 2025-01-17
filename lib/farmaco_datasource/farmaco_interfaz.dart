@@ -47,7 +47,8 @@ class Farmaco {
       biosimilar: json['biosimilar'] ?? false,
       nosustituible: json['nosustituible']?['nombre'] ?? 'N/A',
       psum: json['psum'] ?? false,
-      auto: json['estado']?['aut'] ?? false,
+      auto: json["estado"]["aut"] is bool ? json["estado"]["aut"] : false,
+
       //para poder usar esto hay que utilizar el metodo de image.fromlink de flutter y apuntar sobre farmaco.imagenes
       imagenes: json['fotos'] != null && json['fotos'].isNotEmpty
           ? [json['fotos'][0]['url'] as String] // Extrae solo el primer link
