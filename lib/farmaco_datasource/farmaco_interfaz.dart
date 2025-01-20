@@ -9,40 +9,51 @@ class Farmaco {
   final bool triangulo;
   final bool huerfano;
   final bool biosimilar;
-  final String nosustituible;
-  final bool psum;
-  final bool auto;
   final String dosis;
   final String vtm;
   final String viasAdministracion;
   final String formaFarmaceutica;
+  final String nosustituible;
+  final bool psum;
+  final int auto; // Estado["aut"] ahora se almacena como int (timestamp)
+  final String fichaTecnica;
   final List<String> imagenes;
-  final List<Map<String, dynamic>> docs;
 
-  // Constructor de la clase
-  Farmaco(
-      {required this.nombre,
-      required this.labtitular,
-      required this.labcomercializador,
-      required this.cpresc,
-      required this.receta,
-      required this.generico,
-      required this.conduc,
-      required this.triangulo,
-      required this.huerfano,
-      required this.biosimilar,
-      required this.nosustituible,
-      required this.psum,
-      required this.auto,
-      required this.imagenes,
-      required this.dosis,
-      required this.vtm,
-      required this.viasAdministracion,
-      required this.formaFarmaceutica,
-      required this.docs});
+  Farmaco({
+    required this.nombre,
+    required this.labtitular,
+    required this.labcomercializador,
+    required this.cpresc,
+    required this.receta,
+    required this.generico,
+    required this.conduc,
+    required this.triangulo,
+    required this.huerfano,
+    required this.biosimilar,
+    required this.dosis,
+    required this.vtm,
+    required this.viasAdministracion,
+    required this.formaFarmaceutica,
+    required this.nosustituible,
+    required this.psum,
+    required this.auto,
+    required this.fichaTecnica,
+    required this.imagenes,
+  });
 
-  // Método para convertir un JSON a un objeto Farmaco (espera un elemento de la lista 'resultados')
   factory Farmaco.fromJson(Map<String, dynamic> json) {
+    // Función para obtener la primera URL válida de `docs`
+    String getFirstValidDocUrl(List<dynamic>? docs) {
+      if (docs != null && docs.isNotEmpty) {
+        for (var doc in docs) {
+          if (doc['url'] != null && doc['url'].toString().isNotEmpty) {
+            return doc['url'].toString();
+          }
+        }
+      }
+      return ''; // Retornar string vacío si no hay una URL válida
+    }
+
     return Farmaco(
       nombre: json['nombre'] ?? '',
       labtitular: json['labtitular'] ?? '',
@@ -54,43 +65,23 @@ class Farmaco {
       triangulo: json['triangulo'] ?? false,
       huerfano: json['huerfano'] ?? false,
       biosimilar: json['biosimilar'] ?? false,
-      dosis: json['dosis'] ?? 'A consultar ',
-      vtm: json['vtm'] != null
-          ? json['vtm']['nombre'] ?? 'No disponible'
-          : 'No disponible',
+      dosis: json['dosis'] ?? 'A consultar',
+      vtm: json['vtm']?['nombre'] ?? 'No disponible',
       viasAdministracion: json['viasAdministracion'] != null &&
               json['viasAdministracion'].isNotEmpty
           ? json['viasAdministracion'][0]['nombre'] ?? 'No especificada'
           : 'No especificada',
-      formaFarmaceutica: json['formaFarmaceutica'] != null
-          ? json['formaFarmaceutica']['nombre'] ?? 'No disponible'
-          : 'No disponible',
-
+      formaFarmaceutica:
+          json['formaFarmaceutica']?['nombre'] ?? 'No disponible',
       nosustituible: json['nosustituible']?['nombre'] ?? 'N/A',
       psum: json['psum'] ?? false,
-      auto: json["estado"]["aut"] is bool ? json["estado"]["aut"] : false,
-      docs: json['docs'] != null
-          ? List<Map<String, dynamic>>.from(
-              json['docs']) // Convertimos la lista de documentos
-          : [],
-
-      //para poder usar esto hay que utilizar el metodo de image.fromlink de flutter y apuntar sobre farmaco.imagenes
+      auto: json["estado"]?["aut"] ??
+          0, // Aseguramos que siempre tenga un valor numérico válido
+      fichaTecnica: getFirstValidDocUrl(json['docs']),
       imagenes: json['fotos'] != null && json['fotos'].isNotEmpty
-          ? [json['fotos'][0]['url'] as String] // Extrae solo el primer link
-          : [], // Si no hay fotos, devuelve una lista vacía
+          //ESTO AL IGUAL HAY QUE CAMBIARLO.
+          ? [json['fotos'][0]['url'] as String] // Extrae solo la primera imagen
+          : [],
     );
-  }
-
-  // Método para convertir un JSON con 'resultados' a una lista de Farmacos
-  static List<Farmaco> fromJsonList(Map<String, dynamic> json) {
-    List<dynamic> resultados = json['resultados'] ?? [];
-    return resultados.map((item) => Farmaco.fromJson(item)).toList();
-  }
-
-  // TODO: AQUI CREAR LA FUNCION DE CREAR PROSPECTO.
-  //CREAR PROSPECTO CREARÁ UN TEXTO CON LAS PROPIEDADES CLAVE DE CADA MEDICAMENTO, A PARTIR DEL JSON
-  @override
-  String toString() {
-    return 'Farmaco(nombre: $nombre, labtitular: $labtitular, labcomercializador: $labcomercializador, cpresc: $cpresc, receta: $receta, generico: $generico, conduc: $conduc, triangulo: $triangulo, huerfano: $huerfano, biosimilar: $biosimilar, nosustituible: $nosustituible, psum: $psum, auto: $auto, imagenes: $imagenes)';
   }
 }

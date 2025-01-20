@@ -5,7 +5,7 @@ import 'package:farmadev/farmaco_datasource/farmaco_interfaz.dart';
 class Prospecto extends StatelessWidget {
   final int indice;
   final List<Farmaco> medicamentosObtenidos;
-  final VoidCallback onBack; // Agregamos la función para volver atrás
+  final VoidCallback onBack;
 
   const Prospecto(
       {super.key,
@@ -22,7 +22,7 @@ class Prospecto extends StatelessWidget {
         title: Text('Prospecto: ${farmaco.nombre}'),
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
-          onPressed: onBack, // Permite regresar correctamente
+          onPressed: onBack,
         ),
       ),
       body: SingleChildScrollView(
@@ -80,18 +80,32 @@ class Prospecto extends StatelessWidget {
                 style: const TextStyle(fontSize: 18),
               ),
               const SizedBox(height: 20),
-              if (farmaco.docs.isNotEmpty)
+
+              //*TODO HAY QUE CAMBIAR ESTO POR INFORMACIÓN EXTENDIDA Y/O AVISAR DE CONSULTAR A UN MEDICO, A SER POSIBLE CON UN ICONO DE ASSETS O ALGO QUE TE ADVIERTA DE USO MEDICINAL
+              if (farmaco.fichaTecnica.isNotEmpty)
                 Center(
                   child: ElevatedButton(
                     onPressed: () async {
-                      final url = farmaco.docs[0]['url'];
-                      if (await canLaunchUrl(Uri.parse(url))) {
-                        await launchUrl(Uri.parse(url),
-                            mode: LaunchMode.externalApplication);
+                      final messenger = ScaffoldMessenger.of(context);
+                      final url = farmaco.fichaTecnica;
+
+                      if (url.isNotEmpty &&
+                          Uri.tryParse(url)?.isAbsolute == true) {
+                        final uri = Uri.parse(url);
+                        if (await canLaunchUrl(uri)) {
+                          await launchUrl(uri,
+                              mode: LaunchMode.externalApplication);
+                        } else {
+                          await messenger.showSnackBar(
+                            // Se añade await
+                            const SnackBar(
+                                content: Text('No se pudo abrir el enlace')),
+                          );
+                        }
                       } else {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(
-                              content: Text('No se pudo abrir el enlace')),
+                        await messenger.showSnackBar(
+                          // Se añade await
+                          const SnackBar(content: Text('URL no válida')),
                         );
                       }
                     },
