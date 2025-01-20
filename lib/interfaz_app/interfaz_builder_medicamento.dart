@@ -1,3 +1,4 @@
+import 'package:farmadev/interfaz_app/interfaz_prospecto.dart';
 import 'package:flutter/material.dart';
 import 'package:farmadev/farmaco_datasource/farmaco_interfaz.dart';
 
@@ -15,7 +16,7 @@ class Medicamento extends StatelessWidget {
         title: const Text('Medicamentos encontrados'),
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
-          onPressed: onBack, // 🔄 Se resetea al regresar
+          onPressed: onBack, // Resetea al regresar
         ),
       ),
       body: medicamentosObtenidos.isEmpty
@@ -33,7 +34,6 @@ class Medicamento extends StatelessWidget {
                 Farmaco farmaco = medicamentosObtenidos[index];
 
                 return SingleChildScrollView(
-                  // 🔄 Permite hacer scroll dentro de cada medicamento
                   child: Padding(
                     padding: const EdgeInsets.all(16.0),
                     child: Column(
@@ -44,7 +44,7 @@ class Medicamento extends StatelessWidget {
                           child: Image.network(
                             farmaco.imagenes.isNotEmpty
                                 ? farmaco.imagenes[0]
-                                : 'assets/images/imagen_por_defecto.png', // Usa imagen por defecto de assets
+                                : 'assets/images/imagen_por_defecto.png',
                             fit: BoxFit.cover,
                           ),
                         ),
@@ -63,7 +63,34 @@ class Medicamento extends StatelessWidget {
                           textAlign: TextAlign.center,
                         ),
                         const SizedBox(height: 20),
-                        // Puedes agregar más información aquí y todo será desplazable
+
+                        // Botón para ver el prospecto
+                        Align(
+                          alignment: Alignment.bottomRight,
+                          child: SizedBox(
+                            width: 80,
+                            height: 60,
+                            child: ElevatedButton(
+                              onPressed: () {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) => Prospecto(
+                                      indice: index,
+                                      medicamentosObtenidos:
+                                          medicamentosObtenidos,
+                                      onBack: () {
+                                        Navigator.pop(
+                                            context); // Regresar a la pantalla anterior
+                                      },
+                                    ),
+                                  ),
+                                );
+                              },
+                              child: const Center(child: Text('Ver')),
+                            ),
+                          ),
+                        ),
                       ],
                     ),
                   ),

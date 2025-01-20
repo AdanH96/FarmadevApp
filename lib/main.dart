@@ -1,11 +1,19 @@
 import 'package:farmadev/Escaner/interfaz_escaner.dart';
 import 'package:farmadev/conexiones/consulta_apiCima.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 import 'config/theme/app_theme.dart';
 
 void main() {
-  runApp(const MainApp());
+  //Esto hace que la aplicación solo funcione en modo vertical.
+
+  WidgetsFlutterBinding.ensureInitialized();
+  SystemChrome.setPreferredOrientations([
+    DeviceOrientation.portraitUp,
+  ]).then((_) {
+    runApp(const MainApp());
+  });
 }
 
 class MainApp extends StatelessWidget {

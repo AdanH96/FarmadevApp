@@ -19,6 +19,7 @@ dev_dependencies:
   google_mlkit_text_recognition: ^0.14.0
   image_picker: ^0.8.7+3
   http: ^1.2.2
+  url_launcher: ^6.1.14
 
 flutter:
   uses-material-design: true
